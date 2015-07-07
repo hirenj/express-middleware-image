@@ -2,10 +2,11 @@ var mkdirp    = require('mkdirp')
 	, moment    = require('moment')
 	, request   = require('request')
 	, send      = require('send')
-	, im        = require('imagemagick')
+	, epeg      = require('epeg')
 	, path      = require('path')
 	, fs        = require('fs')
 	, crypto    = require('crypto')
+	, sizeOf    = require('image-size');
 
 var options = {}
 	, regexp = ''
@@ -150,106 +151,24 @@ var _generate = function (opt, callback) {
 	var src = opt.src
 		, dst = opt.dst
 
-	// Trouver les dimensions de l'image source
-	im.identify(['-format', '%wx%h', src], function(err, dimension){
+	var dimensions = sizeOf(src);
+	var origWidth = dimensions.width;
+	var origHeight = dimensions.height;
 
-		if (err) callback(err);
-
-		var arrDimension = dimension.split("x")
-			, origWidth = parseInt(arrDimension[0])
-			, origHeight = parseInt(arrDimension[1])
-			, gravity =  ['NorthWest', 'North', 'NorthEast', 'West', 'Center', 'East', 'SouthWest', 'South', 'SouthEast']
-			, imOptions = {
-				srcPath: src,
-				dstPath: dst,
-				quality: quality
-			}
-
-		// -- Quality
-		if('q' in opt) imOptions.quality = parseInt(opt.q) / 100;
-
-		// -- H+W=C
-		if('h' in opt && 'w' in opt){
-			opt.c = opt.w+'.'+ opt.h
-			delete opt.w
-			delete opt.h
-		}
-
-		// -- SQUARE
-		if('s' in opt){
-
-			var value = parseInt(opt.s)
-
-			if(origHeight > origWidth && value > origWidth){
-				value = origWidth
-			}else
-			if(origWidth > origHeight && value > origHeight){
-				value = origHeight
-			}
-
-			imOptions.gravity = 'Center';
-			imOptions.width = value;
-			imOptions.height = value;
-
-			im.crop(imOptions, function(err, stdout, stderr){
-				callback(err);
-			});
-
-		}else
-
-		// -- CROP
-		if('c' in opt){
-
-			if('g' in opt && gravity.indexOf(opt.g) > -1){
-				imOptions.gravity = opt.g;
-			}else{
-				imOptions.gravity = 'Center';
-			}
-
-			var arrProp = opt.c.split('.')
-			if(arrProp.length != 2) return callback('Crop mode accept only 2 values: w.h');
-
-			imOptions.width = parseInt(arrProp[0]);
-			if(isNaN(imOptions.width)) return callback('Width value is not valid');
-
-			imOptions.height = parseInt(arrProp[1])
-			if(isNaN(imOptions.height)) return callback('Height value is not valid');
-
-			im.crop(imOptions, function(err, stdout, stderr){
-				callback(err);
-			});
-
-		}else
-
-		// -- HEIGHT
-		if('h' in opt){
-			imOptions.height = parseInt(opt.h);
-
-			if(isNaN(imOptions.height)) return callback('Parameter "h" is not a number');
-			if(imOptions.height > origHeight) imOptions.height = origHeight
-
-		}else
-
-		// -- WIDTH
-		if('w' in opt){
-			imOptions.width  = parseInt(opt.w);
-
-			if(isNaN(imOptions.width)) return callback('Parameter "w" is not a number');
-			if(imOptions.width > origWidth) imOptions.width = origWidth
-
-		}
-		
-		else{
-			return callback('Sorry, what did you say ? No comprendo amigo !')
-		}
-
-		// Do The Magic
-		im.resize(imOptions, function(err, stdout, stderr){
-			callback(err);
-		});
-
-	});
-
+	if (opt.h && ! opt.w) {
+		opt.w = parseFloat(parseInt(opt.h * origWidth / origHeight));
+		opt.h = parseFloat(opt.h);
+	} else if (opt.w && ! opt.h) {
+		opt.h = parseFloat(parseInt(opt.w * origHeight / origWidth));
+		opt.w = parseFloat(opt.w);
+	} else if (opt.w && opt.h) {
+		opt.h = parseFloat(opt.h);
+		opt.w = parseFloat(opt.w);
+	}
+	image = new epeg.Image({path: src});
+	image = image.downsize(opt.w, opt.h);
+	image.saveTo(dst);
+	callback();
 }
 
 var _destination = function (url, parameters){

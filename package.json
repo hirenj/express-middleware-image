@@ -1,22 +1,27 @@
 {
-	"author": "Benjamin Mosnier",
-	"name": "express-middleware-image",
-	"description": "Express middleware to resize pictures from url parameters",
-	"keywords": ["express", "middleware", "image", "resizer", "thumbnails", "preview"],
-	"version": "0.0.4",
-
-	"repository": {
-		"url": "git@github.com:kappuccino/express-middleware-image.git"
-	},
-
-	"dependencies": {
-		"request": "2.x",
-		"send": "0.x",
-		"mkdirp": "0.x",
-		"imagemagick": "0.x",
-		"moment": "1.7.x"
-	},
-	"devDependencies": {},
-	"optionalDependencies": {}
-
+  "author": "Benjamin Mosnier, Hiren Joshi",
+  "name": "express-middleware-image",
+  "description": "Express middleware to resize pictures from url parameters",
+  "keywords": [
+    "express",
+    "middleware",
+    "image",
+    "resizer",
+    "thumbnails",
+    "preview"
+  ],
+  "version": "0.0.5",
+  "repository": {
+    "url": "git@github.com:hirenj/express-middleware-image.git"
+  },
+  "dependencies": {
+    "epeg": "0.7.x",
+    "image-size": "0.3.x",
+    "mkdirp": "0.x",
+    "moment": "1.7.x",
+    "request": "2.x",
+    "send": "0.x"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {}
 }
