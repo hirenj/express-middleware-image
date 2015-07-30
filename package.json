@@ -15,7 +15,7 @@
     "url": "git@github.com:hirenj/express-middleware-image.git"
   },
   "dependencies": {
-    "epeg": "phorque/node-epeg",
+    "epeg": "internetbummer/node-epeg",
     "image-size": "0.3.x",
     "mkdirp": "0.x",
     "moment": "1.7.x",

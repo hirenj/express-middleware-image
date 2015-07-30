@@ -12,6 +12,7 @@ var options = {}
 	, regexp = ''
 	, rootDir
 	, cacheDir
+	, rotate
 	, ttl
 	, cacheTTL
 	, quality;
@@ -86,6 +87,7 @@ var media = function(opts) {
 
 		parameters.src = path;
 		parameters.dst = cachedFile;
+		parameters.rotate = rotate;
 
 		_generate(parameters, function(err) {
 				if (err){
@@ -123,6 +125,7 @@ var _parseOptions = function (options) {
 
 	rootDir  = options.root
 	cacheDir = options.cache
+	rotate = options.rotate
 
 	console.log(cacheDir, options);
 
@@ -168,7 +171,11 @@ var _generate = function (opt, callback) {
 	image = new epeg.Image({path: src});
 	image = image.downsize(opt.w, opt.h);
 	image.saveTo(dst);
-	callback();
+	if (opt.rotate) {
+		require('child_process').exec('/usr/bin/exiftran -aip '+dst,callback);
+	} else {
+		callback();
+	}
 }
 
 var _destination = function (url, parameters){
