@@ -168,6 +168,10 @@ var _generate = function (opt, callback) {
 		opt.h = parseFloat(opt.h);
 		opt.w = parseFloat(opt.w);
 	}
+	if (opt.w > origWidth || opt.h > origHeight) {
+		opt.w = origWidth;
+		opt.h = origHeight;
+	}
 	image = new epeg.Image({path: src});
 	image = image.downsize(opt.w, opt.h);
 	image.saveTo(dst);
