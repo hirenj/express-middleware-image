@@ -176,7 +176,7 @@ var _generate = function (opt, callback) {
 	image = image.downsize(opt.w, opt.h);
 	image.saveTo(dst);
 	if (opt.rotate) {
-		require('child_process').exec('/usr/bin/exiftran -aip '+dst,callback);
+		require('child_process').exec('/usr/bin/exiftran -aip "'+dst+'"',callback);
 	} else {
 		callback();
 	}
