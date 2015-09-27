@@ -172,14 +172,19 @@ var _generate = function (opt, callback) {
 		opt.w = origWidth;
 		opt.h = origHeight;
 	}
-	image = new epeg.Image({path: src});
-	image = image.downsize(opt.w, opt.h);
-	image.saveTo(dst);
-	if (opt.rotate) {
-		require('child_process').exec('/usr/bin/exiftran -aip "'+dst+'"',callback);
-	} else {
+	var childProcess = require('child_process').fork(__dirname + '/worker');
+	childProcess.on('message',function() {
 		callback();
-	}
+	});
+	childProcess.send({'src' : src, 'w': opt.w, 'h' : opt.h, 'dst' : dst, 'rotate' : opt.rotate });
+	// var image = new epeg.Image({path: src});
+	// image = image.downsize(opt.w, opt.h);
+	// image.saveTo(dst);
+	// if (opt.rotate) {
+	// 	require('child_process').exec('/usr/bin/exiftran -aip "'+dst+'"',callback);
+	// } else {
+	// 	callback();
+	// }
 }
 
 var _destination = function (url, parameters){
